@@ -1,0 +1,19 @@
+<div class="card-col col-xs-12 col-sm-6 col-md-3 col-lg-2 mt-4">
+    <div class="card" >
+        <div class="card-image">
+            <img src="{{ asset('img/small.png') }}"
+                    {{ stimulus_controller('symfony/ux-lazy-image/lazy-image', {
+                        src: game.icon_2
+                    }) }}
+
+                 width=""
+                 height="" class="card-img" alt="Game Cover">
+            <a href="#">
+                <div class="mask rgba-white-slight"></div>
+            </a>
+        </div>
+        <div class="card-body">
+            <button type="button" class="btn btn-orange-shade card-title">{{ game.name }}</button>
+        </div>
+    </div>
+</div>

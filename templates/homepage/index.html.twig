@@ -1,20 +1,76 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Hello HomepageController!{% endblock %}
-
 {% block body %}
-<style>
-    .example-wrapper { margin: 1em auto; max-width: 800px; width: 95%; font: 18px/1.5 sans-serif; }
-    .example-wrapper code { background: #F5F5F5; padding: 2px 6px; }
-</style>
 
-<div class="example-wrapper">
-    <h1>Hello {{ controller_name }}! ✅</h1>
+<div class="base-style container">
+    <h1>Top Games Casino</h1>
 
-    This friendly message is coming from:
-    <ul>
-        <li>Your controller at <code><a href="{{ 'C:/Users/Dash/websites/casino-test/src/Controller/HomepageController.php'|file_link(0) }}">src/Controller/HomepageController.php</a></code></li>
-        <li>Your template at <code><a href="{{ 'C:/Users/Dash/websites/casino-test/templates/homepage/index.html.twig'|file_link(0) }}">templates/homepage/index.html.twig</a></code></li>
-    </ul>
+    <h4>Filter Games</h4>
+    <div class="sidebar-search mb-1">
+        <div class="input-group custom-search-form">
+            <input type="text" id="search" class="form-control" placeholder="Search here">
+        </div>
+    </div>
+    <div>
+        <h4 class="search-results" style="display: none">No Games Found</h4>
+    </div>
+
+    <div class="card-deck row">
+        {% for game in casino_games %}
+            {{ include('partials/_game_card.html.twig') }}
+        {% endfor %}
+    </div>
 </div>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
+
+<script type="text/javascript"> // Search filter function
+    jQuery(document).ready(function () {
+        let searchRequest = null;
+        $("#search").keyup(function () {
+            let minLength = 3;
+            let that = this;
+            let value = $(this).val();
+            let allCards = $(".card-col");
+            let cardsTitles = $(".card-col > .card > .card-body > .card-title");
+            let searchResults = $(".search-results");
+            if(value.length >= minLength) {
+                if(searchRequest != null) searchRequest.abort();
+                searchRequest = $.ajax({
+                    type: "GET",
+                    url: "{{ path('ajax_search') }}",
+                    data: {
+                        'q': value
+                    },
+                    dataType: "text",
+                    success: function (msg) {
+                        if(value===$(that).val()) {
+                            allCards.hide();
+                            let result = JSON.parse(msg);
+                            $.each(result, function(key, arr) {
+                                $.each(arr, function (id, value) {
+                                    if(key==='posts') {
+                                        if(id!=='error') {
+                                            searchResults.hide(); // Hide No results text
+                                            for (let i = 0; i < cardsTitles.length; i++) { // loop and display search matches
+                                                if (cardsTitles[i].innerHTML === value.name)
+                                                {
+                                                    allCards[i].style.display = 'block';
+                                                    break;
+                                                }
+                                            }
+                                        }else {
+                                            searchResults.show(); // Show No results text
+                                        }
+                                    }
+                                })
+                            })
+                        }
+                    }
+                })
+            }
+            else allCards.show();
+        })
+    })
+</script>
 {% endblock %}
